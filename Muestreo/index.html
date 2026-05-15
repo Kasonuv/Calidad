@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calidad 4.0 UNLa · Entrenador de Muestreo de Aceptación</title>
+  <style>
+    :root{
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --ink:#25262b;
+      --muted:#6b7280;
+      --primary:#a10d3b;      /* bordó institucional inspirado en UNLa/LUMCA */
+      --primary-2:#c01e53;
+      --accent:#d1d5db;
+      --accent-2:#eceff3;
+      --dark:#7d0c31;
+      --warn:#f4a000;
+      --danger:#b3261e;
+      --ok:#167c61;
+      --line:#e5e7eb;
+      --soft:#f9fafb;
+      --shadow:0 18px 42px rgba(17,24,39,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#f4f5f7 0%, #f7f8fa 100%);
+      color:var(--ink);
+    }
+    header{
+      background:#fff;
+      border-bottom:1px solid var(--line);
+      box-shadow:0 4px 18px rgba(17,24,39,.05);
+      padding:10px 18px 14px;
+      position:sticky; top:0; z-index:5;
+    }
+    .wrap{max-width:1320px;margin:auto;position:relative}
+    .brand{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .hero{display:flex;gap:18px;align-items:center;min-width:0}
+    .logo{
+      width:98px;height:98px;border-radius:20px;
+      background:linear-gradient(160deg,#b10f43,#8f0934);
+      display:grid;place-items:center;font-weight:950;color:#fff;
+      box-shadow:0 10px 24px rgba(161,13,59,.22);
+      flex:0 0 auto;
+    }
+    .logo span{display:block;text-align:center;line-height:1}.logo .big{font-size:1.2rem}.logo .small{font-size:.65rem;opacity:.9;letter-spacing:.08em}
+    h1{margin:0;font-size:clamp(1.4rem,2.4vw,2.1rem);letter-spacing:-.03em;font-weight:950;color:var(--primary)}
+    .subtitle{margin:6px 0 0;font-size:clamp(1.05rem,1.8vw,1.22rem);font-weight:900;color:var(--primary)}
+    .subline{margin:8px 0 0;color:var(--muted);max-width:930px;line-height:1.4;font-size:1rem}
+    .author{margin-top:8px;color:#202124;font-weight:900;font-size:.97rem}.author span{font-weight:500;color:var(--muted)}
+    .navstrip{display:flex;gap:18px;align-items:center;color:var(--muted);font-size:.9rem;flex-wrap:wrap}
+    .navitem{display:flex;align-items:center;gap:8px;padding-left:18px;border-left:1px solid var(--line)}
+    .navdot,.navcheck,.navbrand{width:36px;height:36px;border-radius:999px;display:grid;place-items:center;font-weight:900}
+    .navdot{background:#f3f4f6;color:#6b7280}.navcheck{background:#f3f4f6;color:#6b7280}.navbrand{background:var(--primary);color:#fff}
+    main{padding:24px 18px 52px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .card{background:rgba(255,255,255,.98);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px;backdrop-filter:blur(10px)}
+    .card h2{margin:.1rem 0 1rem;font-size:1.25rem;color:var(--dark)}.card h3{margin:1.1rem 0 .6rem;font-size:1.05rem;color:var(--primary)}.muted{color:var(--muted)}
+    label{display:block;font-size:.88rem;font-weight:800;color:#374151;margin:11px 0 5px}input,select,textarea{width:100%;border:1px solid #d1d5db;border-radius:13px;padding:11px 12px;font-size:.98rem;background:#fff;color:var(--ink);outline:none}textarea{min-height:82px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--primary-2);box-shadow:0 0 0 4px rgba(192,30,83,.12)}
+    button{border:0;border-radius:15px;padding:11px 15px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:white;transition:.15s transform,.15s opacity;box-shadow:0 10px 24px rgba(161,13,59,.14)}.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}button:hover{transform:translateY(-1px)}button.secondary{background:#eef1f4;color:#374151;box-shadow:none}button.warn{background:var(--warn);color:#17202a}button.danger{background:var(--danger)}button.ok{background:var(--ok)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:.8rem;font-weight:900;background:#faf5f7;color:var(--primary);border:1px solid #f1c6d5;margin:2px}.pill.warn{background:#fff7df;color:#865900;border-color:#efd18a}.pill.ok{background:#e7f6f1;color:#0d6f5c;border-color:#b8e3d2}.pill.bad{background:#fdeceb;color:#8a1d10;border-color:#f2beb8}
+    .casebox{border-left:7px solid var(--primary-2);padding:14px 14px;background:linear-gradient(135deg,#fff,#faf7f8);border-radius:15px;margin:10px 0}.phase{border:1px dashed #d6aebd;border-radius:18px;padding:16px;background:#fff;margin-top:14px}.locked{filter:grayscale(.7);opacity:.75}.feedback{border-radius:15px;padding:13px 14px;margin-top:12px;font-weight:800}.feedback.ok{background:#e6f7ef;color:#0d6f5c;border:1px solid #b8e3d2}.feedback.err{background:#fdeceb;color:#8a1d10;border:1px solid #f2beb8}.feedback.info{background:#f8f1f4;color:#7d0c31;border:1px solid #efcad7}
+    table{border-collapse:collapse;width:100%;font-size:.92rem}th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{background:#faf5f7;color:#5b1630}.small{font-size:.86rem}.formula{font-family:Cambria,Georgia,serif;background:#fafafa;border:1px solid #e5e7eb;border-radius:12px;padding:10px;margin:8px 0;overflow:auto}.score{font-size:2.1rem;font-weight:950;color:var(--primary)}
+    details{border:1px solid var(--line);border-radius:17px;padding:12px 14px;background:#fff;margin:10px 0}summary{cursor:pointer;font-weight:950;color:var(--primary)}
+    .progress{height:14px;border-radius:999px;background:#eceff3;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--primary-2));transition:.25s width}.hidden{display:none!important}.mono{font-family:Consolas,Monaco,monospace}.footer{color:#6b7280;text-align:center;margin-top:26px;font-size:.9rem}.report{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px}.badgebig{font-size:1.3rem;font-weight:950;color:white;background:linear-gradient(135deg,var(--primary),var(--primary-2));border-radius:16px;padding:10px 14px;display:inline-block}
+    .quality-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.qchip{padding:7px 10px;border-radius:999px;background:#faf5f7;border:1px solid #f1c6d5;font-size:.8rem;font-weight:800;color:var(--primary)}
+    .callout{background:#fff7e8;border:1px solid #efd18a;border-radius:16px;padding:12px 14px;margin:12px 0;color:#6d4c05}
+    @media(max-width:900px){.grid,.grid3{grid-template-columns:1fr}.brand{align-items:flex-start}.hero{align-items:flex-start}.card{padding:16px}.navstrip{width:100%;justify-content:flex-start}}
+    @media print{header,.no-print,button{display:none!important}body{background:white}.card{box-shadow:none;border:1px solid #ddd}.wrap{max-width:100%}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap brand">
+    <div class="hero">
+      <div class="logo"><span><span class="big">C4.0</span><span class="small">UNLa</span></span></div>
+      <div>
+        <h1>Calidad 4.0 UNLa: Entrenador de Muestreo de Aceptación</h1>
+        <p class="subtitle">Laboratorio Universitario de Matemática y Cálculos Aplicados — LUMCA</p>
+        <p class="subline">Departamento de Desarrollo Productivo y Tecnológico — Universidad Nacional de Lanús</p>
+        <p class="author">Prof. Ing. Juan M. Alderete, PhD</p>
+      </div>
+    </div>
+    <div class="navstrip" aria-label="estado">
+      <div class="navitem"><div class="navdot">•</div><div>Registro</div></div>
+      <div class="navitem"><div class="navcheck">✓</div><div>Desempeño</div></div>
+      <div class="navitem"><div class="navbrand">UN</div><div>Online</div></div>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section id="login" class="card">
+    <h2>Ingreso del estudiante</h2>
+    <p class="muted">Completá tus datos para iniciar o recuperar una sesión guardada en este navegador.</p>
+    <div class="grid3">
+      <div><label>Nombre</label><input id="nombre" autocomplete="given-name"></div>
+      <div><label>Apellido</label><input id="apellido" autocomplete="family-name"></div>
+      <div><label>DNI</label><input id="dni"></div>
+    </div>
+    <label>Correo electrónico</label><input id="email" type="email" autocomplete="email">
+    <div class="callout small"><b>Aclaración didáctica importante:</b> en las tablas de atributos, los valores de NCA/AQL mayores que 10 (por ejemplo 100 o 1000) no se leen como porcentaje de unidades defectuosas. Se interpretan como <b>no conformidades por 100 unidades</b>. Así, NCA 100 implica en promedio 1 defecto por unidad, y NCA 1000 implica 10 defectos por unidad.</div>
+    <div class="btnrow">
+      <button onclick="startSession()">Iniciar simulador</button>
+      <button class="secondary" onclick="tryResume()">Continuar sesión guardada</button>
+      <button class="danger" onclick="clearAll()">Borrar sesión</button>
+    </div>
+    <div id="loginMsg"></div>
+  </section>
+
+  <section id="app" class="hidden">
+    <div class="grid">
+      <div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div>
+              <h2 id="caseTitle">Caso</h2>
+              <div id="casePills"></div>
+            </div>
+            <div><span class="pill ok" id="studentBadge"></span></div>
+          </div>
+          <div class="progress" aria-label="avance"><div class="bar" id="bar"></div></div>
+          <p class="small muted" id="progressText"></p>
+          <div id="caseText" class="casebox"></div>
+
+          <div class="phase" id="phase1">
+            <h3>Fase 1 · Definición del plan de muestreo</h3>
+            <p class="muted small">Primero tenés que identificar el tipo de caso y cargar los datos del plan leído en las tablas. La segunda fase queda bloqueada hasta que esta selección sea correcta.</p>
+            <div class="grid3">
+              <div><label>Tipo de plan</label><select id="tipoPlan" onchange="toggleMethodHelp()"><option value="">Seleccionar</option><option value="atributos">Atributos</option><option value="variables-k">Variables · método k</option><option value="variables-m">Variables · método M</option></select></div>
+              <div><label>Tipo de límite</label><select id="limite"><option value="no-aplica">No aplica</option><option value="inferior">Unilateral inferior</option><option value="superior">Unilateral superior</option><option value="bilateral">Bilateral</option></select></div>
+              <div><label>Letra código</label><input id="letra" placeholder="Ej.: K"></div>
+            </div>
+            <div class="grid3">
+              <div><label>Tamaño muestral n</label><input id="n" type="number" step="1"></div>
+              <div id="acBox"><label>Ac</label><input id="ac" type="number" step="1"></div>
+              <div id="reBox"><label>Re</label><input id="re" type="number" step="1"></div>
+            </div>
+            <div class="grid3">
+              <div id="kBox"><label>k</label><input id="k" type="number" step="0.001"></div>
+              <div id="mBox"><label>M</label><input id="m" type="number" step="0.001"></div>
+              <div><label>NCA/AQL leído en tabla</label><input id="aql" placeholder="Ej.: 1.0, 4.0, 0.65"></div>
+            </div>
+            <div id="excelHelp" class="feedback info hidden small"></div>
+            <label>Justificación breve de la lectura de tablas</label><textarea id="justPlan" placeholder="Indicá cómo llegaste a la letra código, tamaño muestral y criterio de aceptación."></textarea>
+            <div class="btnrow">
+              <button onclick="checkPlan()">Verificar plan</button>
+              <button class="secondary" onclick="hintPlan()">Pedir pista</button>
+            </div>
+            <div id="planMsg"></div>
+          </div>
+
+          <div class="phase locked hidden" id="phase2">
+            <h3>Fase 2 · Evaluación del lote</h3>
+            <div id="evalData" class="casebox"></div>
+            <div id="calcFields"></div>
+            <label>Decisión</label><select id="decision"><option value="">Seleccionar</option><option value="aceptar">Aceptar lote</option><option value="rechazar">Rechazar lote</option></select>
+            <label>Justificación técnica de la decisión</label><textarea id="justDecision" placeholder="Compará el valor observado o calculado contra Ac/Re, k o M."></textarea>
+            <div class="btnrow">
+              <button class="ok" onclick="checkDecision()">Cerrar caso</button>
+              <button class="secondary" onclick="calcAssist()">Ayuda de cálculo</button>
+            </div>
+            <div id="decisionMsg"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card no-print">
+          <h2>Panel de avance</h2>
+          <div class="score"><span id="scoreNow">0</span>/100</div>
+          <p class="muted small">Se resuelven 5 casos aleatorios. Cada caso vale 20 puntos.</p>
+          <div id="miniResults"></div>
+          <div class="btnrow"><button class="secondary" onclick="saveSession(true)">Guardar sesión</button><button class="danger" onclick="restartAttempt()">Reiniciar intento</button></div>
+        </div>
+
+        <div class="card no-print">
+          <h2>Instructivo de lectura de tablas</h2>
+          <details open><summary>MIL STD 105D · Atributos</summary>
+            <ol class="small">
+              <li>Partí del tamaño del lote y del nivel de inspección indicado.</li>
+              <li>En la tabla de letras código, cruzá tamaño de lote con nivel S-1 a S-4 o general I, II, III.</li>
+              <li>Con la letra código, ingresá a la tabla maestra correspondiente: normal, estricta o reducida.</li>
+              <li>Cruzá la letra código con el NCA/AQL. La celda entrega Ac y Re.</li>
+              <li>Si aparece una flecha hacia abajo, usá el primer plan indicado debajo de la flecha. Si aparece hacia arriba, usá el primer plan indicado arriba.</li>
+              <li>Si el tamaño muestral iguala o supera el tamaño del lote, corresponde inspección al 100%.</li>
+              <li><b>Ojo con el NCA/AQL:</b> si el valor es mayor que 10, la lectura correcta es <b>no conformidades por 100 unidades</b>, no porcentaje de unidades defectuosas.</li>
+            </ol>
+          </details>
+          <details><summary>MIL STD 414 · Variables</summary>
+            <ol class="small">
+              <li>Partí del tamaño del lote y del nivel de inspección I a V.</li>
+              <li>Obtené la letra código y el tamaño muestral.</li>
+              <li>Si se trabaja con límite unilateral y criterio k, calculá Z y compará con k.</li>
+              <li>Si se trabaja con M, convertí cada Z en proporción defectuosa p y compará la suma contra M.</li>
+              <li>En límites bilaterales, calculá p inferior + p superior.</li>
+            </ol>
+          </details>
+          <details open><summary>Lectura del NCA/AQL · aclaración clave</summary>
+            <div class="small">
+              <p>En las tablas, los valores como <b>0.65</b>, <b>1.0</b> o <b>4.0</b> se leen como <b>porcentaje de unidades no conformes</b>. Ejemplos:</p>
+              <div class="formula">0.65 = 0,65% &nbsp;&nbsp;·&nbsp;&nbsp; 1.0 = 1% &nbsp;&nbsp;·&nbsp;&nbsp; 4.0 = 4%</div>
+              <p>Pero cuando el NCA/AQL es <b>mayor que 10</b>, ya no se interpreta como porcentaje de unidades defectuosas, sino como <b>número de no conformidades por cada 100 unidades</b>.</p>
+              <div class="formula">NCA 100 = 100 no conformidades / 100 unidades = promedio de 1 defecto por unidad</div>
+              <div class="formula">NCA 1000 = 1000 no conformidades / 100 unidades = promedio de 10 defectos por unidad</div>
+              <p>Esto se usa cuando una misma unidad puede presentar <b>varias no conformidades simultáneamente</b> (por ejemplo, varios defectos menores en una etiqueta, una superficie o un envase). Por eso, estos valores <b>no deben convertirse a proporción decimal</b> como si fueran 100% o 1000%.</p>
+            </div>
+          </details>
+          <details><summary>Excel: hallar p a partir de Z en método M</summary>
+            <div class="small">
+              <p>Para método M no uses tabla p-Z: podés usar la normal acumulada en Excel.</p>
+              <div class="formula">p inferior = DISTR.NORM.ESTAND.N(-Z_LIE; VERDADERO)</div>
+              <div class="formula">p superior = DISTR.NORM.ESTAND.N(-Z_LSE; VERDADERO)</div>
+              <p>Con los datos directamente:</p>
+              <div class="formula">=DISTR.NORM.ESTAND.N((LIE-PROMEDIO(rango))/DESVEST.M(rango);VERDADERO)</div>
+              <div class="formula">=1-DISTR.NORM.ESTAND.N((LSE-PROMEDIO(rango))/DESVEST.M(rango);VERDADERO)</div>
+              <p class="muted">En Excel configurado en inglés: <span class="mono">NORM.S.DIST(z,TRUE)</span>, <span class="mono">AVERAGE(range)</span>, <span class="mono">STDEV.S(range)</span>.</p>
+            </div>
+          </details>
+        </div>
+      </aside>
+    </div>
+
+    <section id="finalReport" class="card hidden"></section>
+  </section>
+
+  <div class="footer">Calidad 4.0 UNLa · LUMCA · Simulador didáctico para ejercitar lectura de tablas y toma de decisiones en muestreo de aceptación · Prof. Ing. Juan M. Alderete, PhD</div>
+</main>
+<script>
+const CASES=[
+ {id:'A1',cat:'atributos',title:'Atributos · envases abollados',visible:'Un proveedor entrega un lote de 3000 envases metálicos. La característica se evalúa como conforme/no conforme por abolladuras visibles. Se usará inspección general II, inspección normal, con NCA 1.0.',plan:{tipoPlan:'atributos',limite:'no-aplica',letra:'K',n:125,ac:3,re:4,aql:'1.0'},eval:{def:2,decision:'aceptar'},hint:'MIL STD 105D. Lote 1201 a 3200, nivel II: letra K. Tabla normal, NCA 1.0.'},
+ {id:'A2',cat:'atributos',title:'Atributos · etiquetas ilegibles',visible:'Se recibe un lote de 600 botellas. La inspección verifica si la etiqueta es legible o no. Se aplica inspección general II, inspección normal, NCA 2.5.',plan:{tipoPlan:'atributos',limite:'no-aplica',letra:'J',n:80,ac:5,re:6,aql:'2.5'},eval:{def:6,decision:'rechazar'},hint:'MIL STD 105D. Lote 501 a 1200, nivel II: letra J. Luego tabla normal y NCA 2.5.'},
+ {id:'A3',cat:'atributos',title:'Atributos · cajas con cierre defectuoso',visible:'Un lote de 50 cajas termoselladas se controla por cierre defectuoso. Por antecedentes desfavorables se decide inspección general III, inspección estricta, NCA 4.0.',plan:{tipoPlan:'atributos',limite:'no-aplica',letra:'E',n:13,ac:1,re:2,aql:'4.0'},eval:{def:1,decision:'aceptar'},hint:'MIL STD 105D. Lote 26 a 50, nivel III: letra E. Usar tabla estricta.'},
+ {id:'A4',cat:'atributos',title:'Atributos · blíster incompleto',visible:'Se controla un lote de 12000 blísteres por presencia/ausencia de unidad faltante. El proveedor tiene historial estable y se aplica inspección reducida, nivel general I, NCA 0.65.',plan:{tipoPlan:'atributos',limite:'no-aplica',letra:'K',n:50,ac:1,re:3,aql:'0.65'},eval:{def:2,decision:'aceptar'},hint:'MIL STD 105D. Lote 10001 a 35000, nivel I: letra K. Usar tabla reducida.'},
+ {id:'K1',cat:'variables-k',title:'Variables k · contenido mínimo de proteína',visible:'Un lote de 70 unidades de alimento se evalúa por porcentaje de proteína. Solo interesa cumplir un límite inferior de especificación de 12,0%. Se usa MIL STD 414, nivel III, inspección normal, NCA 1.0, método de desviación estándar con criterio k.',plan:{tipoPlan:'variables-k',limite:'inferior',letra:'G',n:15,k:1.79,aql:'1.00'},eval:{data:[13.1,13.4,12.9,13.2,13.5,12.8,13.0,13.3,13.6,13.1,13.2,13.4,12.9,13.3,13.5],lie:12.0,decision:'aceptar'},hint:'MIL STD 414. Lote 66 a 110, nivel III: letra G. Tabla k, inspección normal, NCA 1.00.'},
+ {id:'K2',cat:'variables-k',title:'Variables k · humedad máxima',visible:'Un lote de 260 unidades se controla por humedad. Solo interesa no superar 8,0%. Se aplica MIL STD 414, nivel II, inspección normal, NCA 2.5, método de desviación estándar con criterio k.',plan:{tipoPlan:'variables-k',limite:'superior',letra:'D',n:5,k:1.33,aql:'2.50'},eval:{data:[7.1,7.4,7.3,7.2,7.5],lse:8.0,decision:'aceptar'},hint:'MIL STD 414. Lote 181 a 300, nivel II: letra D. Límite superior, criterio k.'},
+ {id:'K3',cat:'variables-k',title:'Variables k · peso neto mínimo',visible:'Se recibe un lote de 3500 paquetes. La variable crítica es peso neto, con límite inferior de 500 g. Se usa MIL STD 414, nivel II, inspección normal, NCA 1.5, método de desviación estándar con criterio k.',plan:{tipoPlan:'variables-k',limite:'inferior',letra:'I',n:25,k:1.72,aql:'1.50'},eval:{data:[502,501,503,504,500,502,501,503,499,502,501,504,503,502,500,501,502,503,504,501,500,502,503,501,502],lie:500,decision:'rechazar'},hint:'MIL STD 414. Lote 3201 a 8000, nivel II: letra I. Método k.'},
+ {id:'K4',cat:'variables-k',title:'Variables k · concentración mínima de activo',visible:'Un lote de 900 unidades se controla por concentración de activo. El límite inferior es 95,0 unidades. Se aplica MIL STD 414, nivel IV, inspección normal, NCA 4.0, método de desviación estándar con criterio k.',plan:{tipoPlan:'variables-k',limite:'inferior',letra:'L',n:40,k:1.39,aql:'4.00'},eval:{data:[96.8,97.1,96.5,97.0,96.9,97.2,96.7,96.8,97.0,96.6,97.1,96.9,96.8,96.7,97.0,97.2,96.6,96.9,97.1,96.8,96.7,97.0,96.9,97.1,96.8,96.7,96.9,97.0,96.8,97.2,96.9,96.7,97.1,96.8,97.0,96.9,96.6,97.1,96.8,97.0],lie:95.0,decision:'aceptar'},hint:'MIL STD 414. Lote 801 a 1300, nivel IV: letra L. Método k.'},
+ {id:'M1',cat:'variables-m',title:'Variables M · congéneres en bebida',visible:'Un lote de 50 botellas se evalúa por porcentaje de congéneres volátiles. La especificación es 0,40% a 0,60%. Se aplica MIL STD 414, nivel III, inspección normal, NCA 4.0, método M para límites bilaterales.',plan:{tipoPlan:'variables-m',limite:'bilateral',letra:'C',n:4,m:16.45,aql:'4.00'},eval:{data:[0.46,0.50,0.52,0.48],lie:0.40,lse:0.60,decision:'aceptar'},hint:'MIL STD 414. Lote 41 a 65, nivel III: letra C. Límites dobles: método M.'},
+ {id:'M2',cat:'variables-m',title:'Variables M · diámetro de cápsulas',visible:'Un lote de 700 cápsulas se controla por diámetro con especificación 9,80 a 10,20 mm. Se usa MIL STD 414, nivel III, inspección normal, NCA 1.5, método M para límites bilaterales.',plan:{tipoPlan:'variables-m',limite:'bilateral',letra:'J',n:30,m:2.68,aql:'1.50'},eval:{data:[10.03,10.02,9.99,10.01,10.04,9.98,10.00,10.02,10.01,10.03,9.97,10.02,10.00,10.05,9.99,10.01,10.02,10.03,9.98,10.00,10.04,10.01,10.02,9.99,10.03,10.00,10.02,10.01,10.04,9.98],lie:9.80,lse:10.20,decision:'aceptar'},hint:'MIL STD 414. Lote 501 a 800, nivel III: letra J. Método M bilateral.'},
+ {id:'M3',cat:'variables-m',title:'Variables M · acidez total',visible:'Un lote de 2500 unidades se evalúa por acidez total con especificación 0,70 a 0,90. Se aplica MIL STD 414, nivel II, inspección normal, NCA 1.0, método M.',plan:{tipoPlan:'variables-m',limite:'bilateral',letra:'H',n:20,m:2.86,aql:'1.00'},eval:{data:[0.78,0.79,0.80,0.77,0.81,0.82,0.76,0.79,0.80,0.78,0.77,0.81,0.83,0.78,0.79,0.80,0.76,0.82,0.81,0.77],lie:0.70,lse:0.90,decision:'aceptar'},hint:'MIL STD 414. Lote 1301 a 3200, nivel II: letra H. Método M.'},
+ {id:'M4',cat:'variables-m',title:'Variables M · viscosidad de jarabe',visible:'Un lote de 180 unidades se controla por viscosidad, con especificación 120 a 150 cP. Se aplica MIL STD 414, nivel IV, inspección normal, NCA 2.5, método M para límites bilaterales.',plan:{tipoPlan:'variables-m',limite:'bilateral',letra:'G',n:15,m:4.09,aql:'2.50'},eval:{data:[131,132,129,135,128,133,131,136,130,132,134,129,137,131,133],lie:120,lse:150,decision:'aceptar'},hint:'MIL STD 414. Lote 111 a 180, nivel IV: letra G. Método M.'}
+];
+let state={student:null,assigned:[],idx:0,score:0,results:[],phase1ok:false};
+const STORE='sim-muestreo-aceptacion-v1';
+function $(id){return document.getElementById(id)}
+function normCdf(x){return 0.5*(1+erf(x/Math.SQRT2))}
+function erf(x){const sign=x>=0?1:-1; x=Math.abs(x); const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911; const t=1/(1+p*x); const y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x); return sign*y}
+function mean(a){return a.reduce((s,x)=>s+x,0)/a.length} function sd(a){const m=mean(a); return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1))}
+function pickCases(){let arr=[...CASES]; for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]} return arr.slice(0,5).map(c=>c.id)}
+function startSession(){const nombre=$('nombre').value.trim(),apellido=$('apellido').value.trim(),dni=$('dni').value.trim(),email=$('email').value.trim(); if(!nombre||!apellido||!dni||!email){$('loginMsg').innerHTML='<div class="feedback err">Completá nombre, apellido, DNI y correo.</div>';return} state={student:{nombre,apellido,dni,email,start:new Date().toLocaleString()},assigned:pickCases(),idx:0,score:0,results:[],phase1ok:false}; showApp(); saveSession(false)}
+function tryResume(){const raw=localStorage.getItem(STORE); if(!raw){$('loginMsg').innerHTML='<div class="feedback err">No hay sesión guardada en este navegador.</div>';return} state=JSON.parse(raw); showApp()}
+function saveSession(show){localStorage.setItem(STORE,JSON.stringify(state)); if(show) alert('Sesión guardada en este navegador.')}
+function clearAll(){localStorage.removeItem(STORE); location.reload()}
+function restartAttempt(){if(!confirm('¿Reiniciar el intento y perder el avance actual?'))return; const st=state.student; state={student:{...st,start:new Date().toLocaleString()},assigned:pickCases(),idx:0,score:0,results:[],phase1ok:false}; showCase(); saveSession(false)}
+function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('studentBadge').textContent=`${state.student.apellido}, ${state.student.nombre}`; showCase()}
+function current(){return CASES.find(c=>c.id===state.assigned[state.idx])}
+function showCase(){if(state.idx>=state.assigned.length){renderReport();return} state.phase1ok=false; const c=current(); $('finalReport').classList.add('hidden'); $('caseTitle').textContent=`Caso ${state.idx+1} de 5 · ${c.title}`; $('caseText').innerHTML=`<p>${c.visible}</p>`; $('casePills').innerHTML='<span class="pill">Lectura de tablas</span><span class="pill warn">Fase 2 bloqueada</span>'; $('progressText').textContent=`Avance: ${state.idx}/5 casos cerrados`; $('bar').style.width=`${(state.idx/5)*100}%`; $('scoreNow').textContent=state.score; $('phase2').classList.add('hidden'); $('phase2').classList.add('locked'); ['tipoPlan','limite','letra','n','ac','re','k','m','aql','justPlan','decision','justDecision'].forEach(id=>{if($(id)) $(id).value=''}); $('planMsg').innerHTML=''; $('decisionMsg').innerHTML=''; toggleMethodHelp(); renderMini()}
+function renderMini(){let html='<table><tr><th>Caso</th><th>Puntos</th></tr>'; state.results.forEach((r,i)=>html+=`<tr><td>${i+1}. ${r.id}</td><td>${r.points}/20</td></tr>`); html+='</table>'; $('miniResults').innerHTML=html}
+function toggleMethodHelp(){const v=$('tipoPlan').value; $('acBox').style.display=v==='atributos'||!v?'block':'none'; $('reBox').style.display=v==='atributos'||!v?'block':'none'; $('kBox').style.display=v==='variables-k'||!v?'block':'none'; $('mBox').style.display=v==='variables-m'||!v?'block':'none'; if(v==='variables-m'){$('excelHelp').classList.remove('hidden'); $('excelHelp').innerHTML='<b>Método M:</b> después de calcular Z, hallá p con Excel usando <span class="mono">=DISTR.NORM.ESTAND.N(-Z;VERDADERO)</span>. Para límite superior también podés usar <span class="mono">=1-DISTR.NORM.ESTAND.N((LSE-PROMEDIO(rango))/DESVEST.M(rango);VERDADERO)</span>. <br><span class="small">Recordá: el p obtenido es una <b>proporción defectuosa estimada</b>. Esto es distinto de los NCA/AQL tabulados mayores que 10 en atributos, que se leen como <b>no conformidades por 100 unidades</b>.</span>'} else {$('excelHelp').classList.add('hidden')}}
+function eqNum(a,b,tol=.015){return Math.abs(Number(a)-Number(b))<=tol} function normText(x){return String(x||'').trim().toUpperCase().replace(',','.')}
+function checkPlan(){const c=current(),p=c.plan; let pts=0,errs=[]; if($('tipoPlan').value===p.tipoPlan) pts+=4; else errs.push('tipo de plan'); if($('limite').value===p.limite) pts+=2; else errs.push('tipo de límite'); if(normText($('letra').value)===p.letra) pts+=2; else errs.push('letra código'); if(Number($('n').value)===p.n) pts+=3; else errs.push('tamaño muestral'); if(normText($('aql').value)===normText(p.aql)) pts+=1; else errs.push('NCA/AQL'); if(p.tipoPlan==='atributos'){ if(Number($('ac').value)===p.ac) pts+=2.5; else errs.push('Ac'); if(Number($('re').value)===p.re) pts+=2.5; else errs.push('Re'); } if(p.tipoPlan==='variables-k'){ if(eqNum($('k').value,p.k,.02)) pts+=5; else errs.push('k'); } if(p.tipoPlan==='variables-m'){ if(eqNum($('m').value,p.m,.05)) pts+=5; else errs.push('M'); } if($('justPlan').value.trim().length>20) pts+=1; const ok=errs.length===0; state.tempPlanPts=Math.min(15,pts); if(ok){state.phase1ok=true; $('planMsg').innerHTML='<div class="feedback ok">Plan correcto. Se habilita la segunda fase con los datos de evaluación del lote.</div>'; unlockPhase2();} else {$('planMsg').innerHTML=`<div class="feedback err">Todavía hay errores en: ${errs.join(', ')}. Revisá la lectura de la tabla antes de avanzar.</div>`} saveSession(false)}
+function hintPlan(){const c=current(); $('planMsg').innerHTML=`<div class="feedback info"><b>Pista:</b> ${c.hint}</div>`}
+function unlockPhase2(){const c=current(); $('phase2').classList.remove('hidden','locked'); let html=''; if(c.cat==='atributos'){html=`<p>En la muestra se encontraron <b>${c.eval.def}</b> unidades defectuosas.</p>`; $('calcFields').innerHTML='<label>Defectuosos observados</label><input id="obsDef" type="number" step="1">';}
+ else {const x=c.eval.data; html=`<p>Datos muestrales habilitados:</p><div class="formula small">${x.join('; ')}</div><p class="small muted">Media = ${mean(x).toFixed(4)} · Desvío muestral = ${sd(x).toFixed(4)}</p>`; if(c.cat==='variables-k'){$('calcFields').innerHTML='<div class="grid3"><div><label>Z calculado</label><input id="zCalc" type="number" step="0.001"></div></div>';} else {$('calcFields').innerHTML='<div class="grid3"><div><label>Z inferior</label><input id="zInf" type="number" step="0.001"></div><div><label>Z superior</label><input id="zSup" type="number" step="0.001"></div><div><label>p total (%)</label><input id="pTotal" type="number" step="0.001"></div></div><div class="feedback info small"><b>Excel:</b> p inferior = <span class="mono">DISTR.NORM.ESTAND.N(-Z_LIE;VERDADERO)</span>; p superior = <span class="mono">DISTR.NORM.ESTAND.N(-Z_LSE;VERDADERO)</span>. Sumá ambos y expresalo en % para comparar con M.</div>';}}
+ $('evalData').innerHTML=html; saveSession(false)}
+function expectedCalc(c){if(c.cat==='atributos') return {def:c.eval.def}; const x=c.eval.data,m=mean(x),s=sd(x); let out={}; if(c.eval.lie!==undefined) out.zInf=(m-c.eval.lie)/s; if(c.eval.lse!==undefined) out.zSup=(c.eval.lse-m)/s; if(c.cat==='variables-m'){const pInf=c.eval.lie!==undefined?normCdf(-out.zInf):0; const pSup=c.eval.lse!==undefined?normCdf(-out.zSup):0; out.pTotal=(pInf+pSup)*100;} return out}
+function checkDecision(){const c=current(); let pts=state.tempPlanPts||0; let obsOK=false, calcOK=false, decOK=false, justOK=$('justDecision').value.trim().length>20; if(c.cat==='atributos'){obsOK=Number($('obsDef').value)===c.eval.def; calcOK=obsOK;}
+ else {const ex=expectedCalc(c); if(c.cat==='variables-k'){let z=$('zCalc').value; const target=ex.zInf??ex.zSup; calcOK=eqNum(z,target,.04);} else {const zi=$('zInf').value,zs=$('zSup').value,pt=$('pTotal').value; const ziOK=ex.zInf===undefined || eqNum(zi,ex.zInf,.04); const zsOK=ex.zSup===undefined || eqNum(zs,ex.zSup,.04); const pOK=eqNum(pt,ex.pTotal,.08); calcOK=ziOK&&zsOK&&pOK;}}
+ decOK=$('decision').value===c.eval.decision; if(calcOK) pts+=3; if(decOK) pts+=1.5; if(justOK) pts+=.5; pts=Math.round(Math.min(20,pts)*10)/10; state.score+=pts; state.results.push({id:c.id,title:c.title,points:pts,planPts:state.tempPlanPts||0,calcOK,decOK,decision:c.eval.decision,expected:expectedCalc(c)}); state.idx++; saveSession(false); if(state.idx>=state.assigned.length){renderReport()} else {showCase()}}
+function calcAssist(){const c=current(),ex=expectedCalc(c); let html='<div class="feedback info small"><b>Ayuda:</b> '; if(c.cat==='atributos') html+=`compará defectuosos observados (${c.eval.def}) contra Ac=${c.plan.ac} y Re=${c.plan.re}.`; else if(c.cat==='variables-k'){const z=(ex.zInf??ex.zSup).toFixed(3); html+=`el Z esperado está alrededor de ${z}. Comparalo con k=${c.plan.k}.`;} else {html+=`Z inferior ≈ ${ex.zInf?.toFixed(3)}, Z superior ≈ ${ex.zSup?.toFixed(3)}, p total ≈ ${ex.pTotal.toFixed(3)}%. Comparalo con M=${c.plan.m}. En Excel: =DISTR.NORM.ESTAND.N(-Z;VERDADERO).`;} html+='</div>'; $('decisionMsg').innerHTML=html}
+function renderReport(){$('caseTitle').textContent='Intento finalizado'; $('phase1').classList.add('hidden'); $('phase2').classList.add('hidden'); $('caseText').innerHTML='<p>Se completaron los 5 casos asignados.</p>'; $('bar').style.width='100%'; $('progressText').textContent='Avance: 5/5 casos cerrados'; $('scoreNow').textContent=state.score.toFixed(1); const level=state.score>=90?'Excelente':state.score>=75?'Muy satisfactorio':state.score>=60?'Satisfactorio básico':'Insuficiente'; let rows=''; state.results.forEach((r,i)=>{rows+=`<tr><td>${i+1}</td><td>${r.title}</td><td>${r.points}/20</td><td>${r.calcOK?'Correcto':'Revisar'}</td><td>${r.decOK?'Correcta':'Revisar'}</td></tr>`}); $('finalReport').classList.remove('hidden'); $('finalReport').innerHTML=`<h2>Informe de desempeño</h2><div class="report"><p><span class="badgebig">${level}</span></p><p><b>Estudiante:</b> ${state.student.nombre} ${state.student.apellido}<br><b>DNI:</b> ${state.student.dni}<br><b>Correo:</b> ${state.student.email}<br><b>Inicio:</b> ${state.student.start}<br><b>Cierre:</b> ${new Date().toLocaleString()}<br><b>Simulador:</b> Calidad 4.0 UNLa · LUMCA · Prof. Ing. Juan M. Alderete, PhD</p><p class="score">Calificación: ${state.score.toFixed(1)}/100</p><table><tr><th>#</th><th>Caso</th><th>Puntaje</th><th>Cálculo</th><th>Decisión</th></tr>${rows}</table><p class="small muted">El muestreo de aceptación permite decidir sobre lotes; no sustituye el control estadístico del proceso ni permite, por sí solo, inferir integralmente la calidad del proceso.</p></div><div class="btnrow no-print"><button onclick="window.print()">Imprimir / guardar PDF</button><button class="secondary" onclick="restartAttempt()">Nuevo intento</button></div>`; renderMini(); saveSession(false)}
+window.addEventListener('beforeunload',()=>saveSession(false));
+</script>
+</body>
+</html>
