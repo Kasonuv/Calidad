@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculador de Pérdidas de Taguchi - UNLa</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --unla-verde: #007a3d;
+      --unla-verde-oscuro: #00552b;
+      --unla-verde-claro: #e6f3ed;
+      --unla-gris: #4a4a4a;
+      --unla-gris-claro: #f4f6f7;
+      --unla-blanco: #ffffff;
+      --unla-acento: #f2b705;
+      --riesgo: #b00020;
+      --borde: #d9e1e5;
+      --sombra: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #f5f7f8 0%, #e8f1ec 100%);
+      color: #222;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--unla-verde-oscuro), var(--unla-verde));
+      color: var(--unla-blanco);
+      padding: 30px 36px;
+      border-bottom: 6px solid var(--unla-acento);
+    }
+
+    .header-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .logo-box {
+      width: 74px;
+      height: 74px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      letter-spacing: -1px;
+      font-size: 24px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 15px;
+      opacity: 0.94;
+      max-width: 850px;
+    }
+
+    .institution {
+      text-align: right;
+      font-size: 14px;
+      line-height: 1.4;
+      opacity: 0.96;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 28px auto 46px;
+      padding: 0 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(340px, 430px) 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--unla-blanco);
+      border: 1px solid var(--borde);
+      border-radius: 22px;
+      box-shadow: var(--sombra);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 22px;
+      background: var(--unla-verde-claro);
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--unla-verde-oscuro);
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      color: var(--unla-gris);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cfd9dd;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #fff;
+      transition: 0.18s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--unla-verde);
+      box-shadow: 0 0 0 4px rgba(0, 122, 61, 0.12);
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .hint {
+      font-size: 12px;
+      line-height: 1.4;
+      color: #69767c;
+      margin-top: 4px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+    }
+
+    .primary {
+      background: var(--unla-verde);
+      color: white;
+    }
+
+    .secondary {
+      background: #edf2f4;
+      color: #263238;
+    }
+
+    .danger {
+      background: #fff0f2;
+      color: var(--riesgo);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .metric {
+      background: linear-gradient(180deg, #ffffff, #f6faf8);
+      border: 1px solid var(--borde);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .metric .label {
+      font-size: 12px;
+      color: #647177;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .metric .value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--unla-verde-oscuro);
+      overflow-wrap: anywhere;
+    }
+
+    .metric .note {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #78858a;
+    }
+
+    .chart-wrap {
+      height: 380px;
+      padding: 10px 4px 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 18px;
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+      background: white;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #e8eef1;
+      text-align: right;
+      font-size: 13px;
+    }
+
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2) {
+      text-align: left;
+    }
+
+    th {
+      background: #f2f7f4;
+      color: var(--unla-verde-oscuro);
+      font-weight: 800;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-ok {
+      color: var(--unla-verde-oscuro);
+      font-weight: 800;
+    }
+
+    .status-warn {
+      color: #a16b00;
+      font-weight: 800;
+    }
+
+    .status-bad {
+      color: var(--riesgo);
+      font-weight: 800;
+    }
+
+    .formula-box {
+      background: #fbfcfd;
+      border: 1px dashed #b9c9cf;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 18px;
+      color: #45525a;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .formula {
+      display: inline-block;
+      background: white;
+      border: 1px solid #e0e7ea;
+      border-radius: 10px;
+      padding: 6px 9px;
+      margin: 4px 0;
+      color: var(--unla-verde-oscuro);
+      font-weight: 800;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      padding: 16px 18px;
+      background: #ffffffcc;
+      border: 1px solid var(--borde);
+      border-radius: 18px;
+      color: #536067;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--unla-verde-claro);
+      color: var(--unla-verde-oscuro);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .results-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .header-content {
+        grid-template-columns: 1fr;
+      }
+      .institution {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 580px) {
+      header {
+        padding: 24px 18px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      .two-cols,
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand {
+        align-items: flex-start;
+      }
+      .logo-box {
+        width: 62px;
+        height: 62px;
+        font-size: 20px;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      button, textarea, input, select {
+        box-shadow: none !important;
+      }
+      .card {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="brand">
+        <div class="logo-box">UNLa</div>
+        <div>
+          <h1>Calculador de Pérdidas de Taguchi</h1>
+          <p class="subtitle">Función cuadrática de pérdida respecto del valor objetivo: estimación económica por unidad, por lote o por período de producción.</p>
+        </div>
+      </div>
+      <div class="institution">
+        Universidad Nacional de Lanús<br />
+        Calidad · Mejora continua · Procesos
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="card">
+        <div class="card-header">
+          <h2>Datos de entrada</h2>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="processName">Proceso, producto o lote evaluado</label>
+            <input id="processName" type="text" value="Llenado de envases" />
+          </div>
+
+          <div class="field">
+            <label for="qualityChar">Característica de calidad</label>
+            <input id="qualityChar" type="text" value="Contenido neto" />
+          </div>
+
+          <div class="two-cols">
+            <div class="field">
+              <label for="target">Target u objetivo (T)</label>
+              <input id="target" type="number" step="any" value="500" />
+            </div>
+            <div class="field">
+              <label for="unitName">Unidad de medida</label>
+              <input id="unitName" type="text" value="g" />
+            </div>
+          </div>
+
+          <div class="two-cols">
+            <div class="field">
+              <label for="lsl">Límite inferior de especificación</label>
+              <input id="lsl" type="number" step="any" value="495" />
+            </div>
+            <div class="field">
+              <label for="usl">Límite superior de especificación</label>
+              <input id="usl" type="number" step="any" value="505" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="lossAtSpec">Pérdida económica en el límite de especificación (A)</label>
+            <input id="lossAtSpec" type="number" step="any" value="120" />
+            <div class="hint">Debe expresarse en la moneda deseada. Ejemplo: pesos por unidad cuando el valor llega al límite de especificación.</div>
+          </div>
+
+          <div class="field">
+            <label for="calculationMode">Modo de cálculo</label>
+            <select id="calculationMode" onchange="toggleModeFields()">
+              <option value="unit">Pérdida por unidad</option>
+              <option value="lot" selected>Pérdida por lote</option>
+              <option value="time">Pérdida por tiempo o período</option>
+            </select>
+          </div>
+
+          <div id="lotFields" class="two-cols">
+            <div class="field">
+              <label for="lotSize">Cantidad de unidades del lote</label>
+              <input id="lotSize" type="number" step="1" value="10000" />
+            </div>
+            <div class="field">
+              <label for="sampleSize">Tamaño de muestra</label>
+              <input id="sampleSize" type="number" step="1" value="10" readonly />
+              <div class="hint">Se actualiza según la cantidad de mediciones cargadas.</div>
+            </div>
+          </div>
+
+          <div id="timeFields" class="two-cols hidden">
+            <div class="field">
+              <label for="productionRate">Unidades producidas por período</label>
+              <input id="productionRate" type="number" step="any" value="48000" />
+            </div>
+            <div class="field">
+              <label for="periodName">Nombre del período</label>
+              <input id="periodName" type="text" value="mes" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="measurements">Mediciones observadas</label>
+            <textarea id="measurements">498.8
+500.9
+502.4
+497.6
+503.1
+499.4
+501.2
+496.9
+500.2
+504.3</textarea>
+            <div class="hint">Ingresar una medición por línea o separar valores con coma, punto y coma, tabulación o espacio.</div>
+          </div>
+
+          <div class="button-row">
+            <button class="primary" onclick="calculate()">Calcular pérdidas</button>
+            <button class="secondary" onclick="loadExample()">Cargar ejemplo</button>
+            <button class="danger" onclick="clearMeasurements()">Limpiar mediciones</button>
+          </div>
+
+          <div class="formula-box">
+            <strong>Modelo utilizado</strong><br />
+            <span class="formula">L(y) = k (y - T)²</span><br />
+            <span class="formula">k = A / Δ²</span><br />
+            La pérdida crece con el cuadrado del desvío respecto del target. Δ se calcula como la menor distancia entre el target y los límites de especificación.
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Resultados y gráfica de la función de pérdida</h2>
+        </div>
+        <div class="card-body">
+          <div class="results-grid">
+            <div class="metric">
+              <div class="label">Constante k</div>
+              <div id="kValue" class="value">—</div>
+              <div class="note">Sensibilidad económica al desvío.</div>
+            </div>
+            <div class="metric">
+              <div class="label">Pérdida promedio por unidad</div>
+              <div id="avgLoss" class="value">—</div>
+              <div class="note">Promedio de las mediciones cargadas.</div>
+            </div>
+            <div class="metric">
+              <div class="label">Pérdida total estimada</div>
+              <div id="totalLoss" class="value">—</div>
+              <div id="totalLossNote" class="note">Según modo seleccionado.</div>
+            </div>
+            <div class="metric">
+              <div class="label">Desvío medio absoluto</div>
+              <div id="madValue" class="value">—</div>
+              <div class="note">Distancia promedio respecto del target.</div>
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="lossChart"></canvas>
+          </div>
+
+          <div id="summaryText" class="footer-note">
+            Complete los datos y presione <strong>Calcular pérdidas</strong>. El sistema graficará la parábola de Taguchi, ubicará las mediciones observadas y estimará la pérdida económica correspondiente.
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Estado</th>
+                  <th>Medición</th>
+                  <th>Desvío y - T</th>
+                  <th>|Desvío|</th>
+                  <th>Pérdida por unidad</th>
+                  <th>Pérdida relativa vs. A</th>
+                </tr>
+              </thead>
+              <tbody id="resultTable">
+                <tr><td colspan="7" style="text-align:center;color:#6d7a80;">Sin resultados calculados.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    let chart;
+
+    function parseNumber(value) {
+      if (typeof value !== 'string') return Number(value);
+      return Number(value.trim().replace(',', '.'));
+    }
+
+    function parseMeasurements(raw) {
+      return raw
+        .split(/[\n,;\t ]+/)
+        .map(v => v.trim())
+        .filter(Boolean)
+        .map(parseNumber)
+        .filter(v => Number.isFinite(v));
+    }
+
+    function money(value) {
+      if (!Number.isFinite(value)) return '—';
+      return value.toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function numberFmt(value, digits = 4) {
+      if (!Number.isFinite(value)) return '—';
+      return value.toLocaleString('es-AR', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: digits
+      });
+    }
+
+    function toggleModeFields() {
+      const mode = document.getElementById('calculationMode').value;
+      document.getElementById('lotFields').classList.toggle('hidden', mode !== 'lot');
+      document.getElementById('timeFields').classList.toggle('hidden', mode !== 'time');
+    }
+
+    function getStatus(y, lsl, usl, target) {
+      if (y < lsl || y > usl) return { text: 'Fuera de especificación', cls: 'status-bad' };
+      const tolerance = Math.min(Math.abs(target - lsl), Math.abs(usl - target));
+      const deviation = Math.abs(y - target);
+      if (deviation >= 0.75 * tolerance) return { text: 'Dentro, pérdida alta', cls: 'status-warn' };
+      return { text: 'Dentro de especificación', cls: 'status-ok' };
+    }
+
+    function calculate() {
+      const processName = document.getElementById('processName').value || 'Proceso no identificado';
+      const qualityChar = document.getElementById('qualityChar').value || 'Característica no identificada';
+      const unitName = document.getElementById('unitName').value || 'unidad';
+      const target = parseNumber(document.getElementById('target').value);
+      const lsl = parseNumber(document.getElementById('lsl').value);
+      const usl = parseNumber(document.getElementById('usl').value);
+      const lossAtSpec = parseNumber(document.getElementById('lossAtSpec').value);
+      const mode = document.getElementById('calculationMode').value;
+      const measurements = parseMeasurements(document.getElementById('measurements').value);
+      document.getElementById('sampleSize').value = measurements.length;
+
+      if (![target, lsl, usl, lossAtSpec].every(Number.isFinite)) {
+        alert('Revise los datos básicos: target, límites de especificación y pérdida económica deben ser numéricos.');
+        return;
+      }
+      if (lsl >= usl) {
+        alert('El límite inferior debe ser menor que el límite superior.');
+        return;
+      }
+      if (!(target > lsl && target < usl)) {
+        alert('Para este calculador, el target debe ubicarse entre el límite inferior y el límite superior.');
+        return;
+      }
+      if (lossAtSpec <= 0) {
+        alert('La pérdida económica en el límite de especificación debe ser mayor que cero.');
+        return;
+      }
+      if (measurements.length === 0) {
+        alert('Debe ingresar al menos una medición válida.');
+        return;
+      }
+
+      const deltaLower = Math.abs(target - lsl);
+      const deltaUpper = Math.abs(usl - target);
+      const delta = Math.min(deltaLower, deltaUpper);
+      const k = lossAtSpec / Math.pow(delta, 2);
+
+      const rows = measurements.map((y, idx) => {
+        const deviation = y - target;
+        const absDeviation = Math.abs(deviation);
+        const loss = k * Math.pow(deviation, 2);
+        const status = getStatus(y, lsl, usl, target);
+        return { idx: idx + 1, y, deviation, absDeviation, loss, status };
+      });
+
+      const avgLoss = rows.reduce((sum, r) => sum + r.loss, 0) / rows.length;
+      const totalMeasuredLoss = rows.reduce((sum, r) => sum + r.loss, 0);
+      const mad = rows.reduce((sum, r) => sum + r.absDeviation, 0) / rows.length;
+      const outsideCount = rows.filter(r => r.y < lsl || r.y > usl).length;
+
+      let totalLoss = avgLoss;
+      let totalNote = 'Pérdida promedio por unidad.';
+      let modeLabel = 'por unidad';
+
+      if (mode === 'lot') {
+        const lotSize = parseNumber(document.getElementById('lotSize').value);
+        if (!Number.isFinite(lotSize) || lotSize <= 0) {
+          alert('La cantidad de unidades del lote debe ser mayor que cero.');
+          return;
+        }
+        totalLoss = avgLoss * lotSize;
+        totalNote = `Estimación para ${numberFmt(lotSize, 0)} unidades del lote.`;
+        modeLabel = 'por lote';
+      }
+
+      if (mode === 'time') {
+        const productionRate = parseNumber(document.getElementById('productionRate').value);
+        const periodName = document.getElementById('periodName').value || 'período';
+        if (!Number.isFinite(productionRate) || productionRate <= 0) {
+          alert('Las unidades producidas por período deben ser mayores que cero.');
+          return;
+        }
+        totalLoss = avgLoss * productionRate;
+        totalNote = `Estimación para ${numberFmt(productionRate, 0)} unidades por ${periodName}.`;
+        modeLabel = `por ${periodName}`;
+      }
+
+      document.getElementById('kValue').textContent = numberFmt(k, 6);
+      document.getElementById('avgLoss').textContent = '$ ' + money(avgLoss);
+      document.getElementById('totalLoss').textContent = '$ ' + money(totalLoss);
+      document.getElementById('totalLossNote').textContent = totalNote;
+      document.getElementById('madValue').textContent = `${numberFmt(mad, 4)} ${unitName}`;
+
+      renderTable(rows, lossAtSpec);
+      renderChart(target, lsl, usl, k, rows, unitName, lossAtSpec);
+
+      document.getElementById('summaryText').innerHTML = `
+        <span class="pill">${processName}</span><br><br>
+        Para la característica <strong>${qualityChar}</strong>, con target <strong>${numberFmt(target, 4)} ${unitName}</strong>, la pérdida promedio estimada es de <strong>$ ${money(avgLoss)}</strong> por unidad.
+        En el modo seleccionado, la pérdida total estimada ${modeLabel} asciende a <strong>$ ${money(totalLoss)}</strong>.
+        Se detectaron <strong>${outsideCount}</strong> mediciones fuera de especificación sobre <strong>${rows.length}</strong> mediciones cargadas.
+      `;
+    }
+
+    function renderTable(rows, lossAtSpec) {
+      const tbody = document.getElementById('resultTable');
+      tbody.innerHTML = '';
+
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        const relative = lossAtSpec > 0 ? (r.loss / lossAtSpec) * 100 : 0;
+        tr.innerHTML = `
+          <td>${r.idx}</td>
+          <td class="${r.status.cls}">${r.status.text}</td>
+          <td>${numberFmt(r.y, 4)}</td>
+          <td>${numberFmt(r.deviation, 4)}</td>
+          <td>${numberFmt(r.absDeviation, 4)}</td>
+          <td>$ ${money(r.loss)}</td>
+          <td>${numberFmt(relative, 2)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderChart(target, lsl, usl, k, rows, unitName, lossAtSpec) {
+      const ctx = document.getElementById('lossChart');
+      const span = Math.max(Math.abs(usl - lsl), 1);
+      const minX = lsl - span * 0.35;
+      const maxX = usl + span * 0.35;
+      const points = [];
+      const steps = 160;
+      for (let i = 0; i <= steps; i++) {
+        const x = minX + ((maxX - minX) * i / steps);
+        points.push({ x, y: k * Math.pow(x - target, 2) });
+      }
+
+      const observed = rows.map(r => ({ x: r.y, y: r.loss }));
+
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+          datasets: [
+            {
+              label: 'Función de pérdida de Taguchi',
+              data: points,
+              type: 'line',
+              showLine: true,
+              pointRadius: 0,
+              borderWidth: 3,
+              tension: 0.25
+            },
+            {
+              label: 'Mediciones observadas',
+              data: observed,
+              pointRadius: 5,
+              pointHoverRadius: 8
+            },
+            {
+              label: 'Target',
+              data: [{ x: target, y: 0 }],
+              pointRadius: 7,
+              pointHoverRadius: 9
+            },
+            {
+              label: 'Límites de especificación',
+              data: [{ x: lsl, y: lossAtSpec }, { x: usl, y: lossAtSpec }],
+              pointRadius: 6,
+              pointHoverRadius: 8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 18
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const x = context.parsed.x;
+                  const y = context.parsed.y;
+                  return `${context.dataset.label}: ${numberFmt(x, 4)} ${unitName}; pérdida $ ${money(y)}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: `Valor medido (${unitName})`
+              },
+              min: minX,
+              max: maxX
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Pérdida económica por unidad'
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function loadExample() {
+      document.getElementById('processName').value = 'Llenado de envases';
+      document.getElementById('qualityChar').value = 'Contenido neto';
+      document.getElementById('target').value = '500';
+      document.getElementById('unitName').value = 'g';
+      document.getElementById('lsl').value = '495';
+      document.getElementById('usl').value = '505';
+      document.getElementById('lossAtSpec').value = '120';
+      document.getElementById('calculationMode').value = 'lot';
+      document.getElementById('lotSize').value = '10000';
+      document.getElementById('productionRate').value = '48000';
+      document.getElementById('periodName').value = 'mes';
+      document.getElementById('measurements').value = '498.8\n500.9\n502.4\n497.6\n503.1\n499.4\n501.2\n496.9\n500.2\n504.3';
+      toggleModeFields();
+      calculate();
+    }
+
+    function clearMeasurements() {
+      document.getElementById('measurements').value = '';
+      document.getElementById('resultTable').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#6d7a80;">Sin resultados calculados.</td></tr>';
+    }
+
+    toggleModeFields();
+    window.addEventListener('load', calculate);
+  </script>
+</body>
+</html>
