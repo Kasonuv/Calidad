@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simuladores de Calidad 4.0 | UNLa</title>
+  <style>
+    :root {
+      --azul-unla: #005baa;
+      --azul-profundo: #08345f;
+      --celeste: #00a6d6;
+      --verde: #00a878;
+      --gris-fondo: #f4f7fb;
+      --gris-texto: #344054;
+      --gris-suave: #e6edf5;
+      --blanco: #ffffff;
+      --sombra: 0 18px 40px rgba(8, 52, 95, 0.14);
+      --radio: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(0, 166, 214, 0.18), transparent 32%),
+        linear-gradient(135deg, #f8fbff 0%, #eef5fb 45%, #ffffff 100%);
+      color: var(--gris-texto);
+      min-height: 100vh;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      color: var(--blanco);
+      background: linear-gradient(135deg, var(--azul-profundo), var(--azul-unla) 58%, var(--celeste));
+      padding: 56px 24px 72px;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero {
+      max-width: 1120px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 22px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #7dffcf;
+      box-shadow: 0 0 0 6px rgba(125, 255, 207, 0.16);
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 4.8rem);
+      line-height: 1.03;
+      max-width: 880px;
+      margin-bottom: 20px;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      line-height: 1.55;
+      max-width: 820px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.94);
+    }
+
+    main {
+      max-width: 1120px;
+      margin: -42px auto 0;
+      padding: 0 24px 56px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(230, 237, 245, 0.9);
+      box-shadow: var(--sombra);
+      border-radius: var(--radio);
+      padding: 26px;
+      margin-bottom: 28px;
+    }
+
+    .panel-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      color: var(--azul-profundo);
+      font-size: clamp(1.35rem, 2vw, 1.9rem);
+      margin-bottom: 8px;
+    }
+
+    .panel p {
+      line-height: 1.55;
+    }
+
+    .counter {
+      min-width: 130px;
+      text-align: center;
+      border-radius: 18px;
+      padding: 14px;
+      background: linear-gradient(135deg, rgba(0, 91, 170, 0.1), rgba(0, 166, 214, 0.14));
+      border: 1px solid var(--gris-suave);
+    }
+
+    .counter strong {
+      display: block;
+      font-size: 2rem;
+      color: var(--azul-unla);
+    }
+
+    .counter span {
+      font-size: 0.86rem;
+      color: #667085;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      background: var(--blanco);
+      border: 1px solid var(--gris-suave);
+      border-radius: 20px;
+      padding: 22px;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--azul-unla), var(--celeste), var(--verde));
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 38px rgba(8, 52, 95, 0.12);
+      border-color: rgba(0, 91, 170, 0.35);
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(0, 91, 170, 0.11), rgba(0, 166, 214, 0.14));
+      color: var(--azul-profundo);
+      font-size: 1.45rem;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      color: var(--azul-profundo);
+      font-size: 1.16rem;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #526071;
+      font-size: 0.96rem;
+      line-height: 1.48;
+      margin-bottom: 18px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 7px 10px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    .status.ok {
+      color: #00694b;
+      background: rgba(0, 168, 120, 0.12);
+    }
+
+    .status.beta {
+      color: #8a5a00;
+      background: rgba(255, 184, 0, 0.16);
+    }
+
+    .status.soon {
+      color: #475467;
+      background: #eef2f6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--blanco);
+      background: linear-gradient(135deg, var(--azul-unla), var(--celeste));
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      transition: filter 0.2s ease, transform 0.2s ease;
+    }
+
+    a.button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    a.button.disabled {
+      pointer-events: none;
+      color: #667085;
+      background: #e8eef5;
+    }
+
+    .note {
+      margin-top: 28px;
+      padding: 20px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(0, 91, 170, 0.08), rgba(0, 166, 214, 0.08));
+      border: 1px solid var(--gris-suave);
+    }
+
+    .note strong {
+      color: var(--azul-profundo);
+    }
+
+    footer {
+      border-top: 1px solid var(--gris-suave);
+      background: rgba(255, 255, 255, 0.7);
+      padding: 28px 24px 34px;
+      text-align: center;
+      color: #667085;
+      font-size: 0.93rem;
+      line-height: 1.55;
+    }
+
+    footer strong {
+      color: var(--azul-profundo);
+    }
+
+    @media (max-width: 920px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      header {
+        padding: 42px 18px 66px;
+      }
+
+      main {
+        padding: 0 16px 44px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .panel-top {
+        flex-direction: column;
+      }
+
+      .counter {
+        width: 100%;
+        text-align: left;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <section class="hero">
+      <div class="eyebrow"><span class="dot"></span> Aula digital · Calidad 4.0</div>
+      <h1>Simuladores interactivos de Calidad</h1>
+      <p>
+        Herramientas didácticas para aprender, practicar y aplicar conceptos de control estadístico,
+        muestreo de aceptación, mejora continua, costos de calidad y análisis de procesos.
+      </p>
+      <div class="hero-meta">
+        <span class="pill">Licenciatura en Ciencia y Tecnología de los Alimentos</span>
+        <span class="pill">UNLa</span>
+        <span class="pill">LUMCA</span>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-top">
+        <div>
+          <h2>Índice de recursos</h2>
+          <p>
+            Seleccioná el simulador o la lección interactiva que corresponda. Cada recurso fue pensado
+            para acompañar actividades prácticas, análisis de casos y resolución guiada de problemas.
+          </p>
+        </div>
+        <div class="counter">
+          <strong>6</strong>
+          <span>recursos listados</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div>
+            <div class="icon">📈</div>
+            <span class="status ok">Disponible</span>
+            <h3>Control Estadístico y Capacidad</h3>
+            <p>
+              Simulador para analizar gráficos de control, límites de control, especificaciones,
+              Cp, Cpk y señales de inestabilidad del proceso.
+            </p>
+          </div>
+          <div class="actions">
+            <a class="button" href="simulador%20CEP%20y%20CCO/">Ingresar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div>
+            <div class="icon">🧪</div>
+            <span class="status ok">Disponible</span>
+            <h3>Muestreo de Aceptación</h3>
+            <p>
+              Recurso para practicar lectura de tablas, selección de planes por atributos o variables
+              y análisis de decisiones lote a lote.
+            </p>
+          </div>
+          <div class="actions">
+            <a class="button" href="Muestreo/">Ingresar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div>
+            <div class="icon">📊</div>
+            <span class="status ok">Disponible</span>
+            <h3>Curva Característica de Operación</h3>
+            <p>
+              Lección interactiva para comprender la CCO, su lectura, su construcción y su relación
+              con modelos discretos de probabilidad.
+            </p>
+          </div>
+          <div class="actions">
+            <a class="button" href="CCO/">Ingresar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div>
+            <div class="icon">🐟</div>
+            <span class="status beta">Versión beta</span>
+            <h3>Ishikawa + 5 Porqués</h3>
+            <p>
+              Asistente para clasificar causas según las 6M, formular hipótesis causales y avanzar
+              hacia causas raíz mediante preguntas sucesivas.
+            </p>
+          </div>
+          <div class="actions">
+            <a class="button" href="Game%20Ishikawa/">Ingresar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div>
+            <div class="icon">🎯</div>
+            <span class="status ok">Disponible</span>
+            <h3>Pérdidas de Taguchi</h3>
+            <p>
+              Calculadora para estimar pérdidas cuadráticas respecto del valor objetivo, por unidad,
+              lote o período de producción.
+            </p>
+          </div>
+          <div class="actions">
+            <a class="button" href="Calculadora%20Taguchi/">Ingresar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div>
+            <div class="icon">⚙️</div>
+            <span class="status soon">Próximamente</span>
+            <h3>Costos relacionados con la calidad</h3>
+            <p>
+              Actividades para clasificar costos de prevención, evaluación, fallas internas y fallas
+              externas, con análisis de ahorro esperado.
+            </p>
+          </div>
+          <div class="actions">
+            <a class="button disabled" href="#">Próximamente</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="note">
+        <p>
+          <strong>Sugerencia de uso:</strong> cada simulador puede emplearse como apoyo a una actividad práctica,
+          una instancia de aula invertida o una evaluación breve basada en casos. Para modificar los enlaces,
+          editá los valores del atributo <code>href</code> en cada tarjeta.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>Prof. Ing. Juan M. Alderete, PhD</strong></p>
+    <p>Universidad Nacional de Lanús · Laboratorio Universitario de Matemática y Cálculos Aplicados</p>
+    <p>Material académico para actividades de Calidad 4.0</p>
+  </footer>
+</body>
+</html>
